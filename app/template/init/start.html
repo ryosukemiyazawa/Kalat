@@ -1,0 +1,88 @@
+<h2>Install Kalat</h2>
+<p>Version: <?php echo KALAT_VERSION; ?></p>
+
+<hr />
+
+<form class="form-horizontal" method="post">
+
+	<h4>Site</h4>
+
+	<div class="form-group">
+		<label for="inputEmail3" class="col-sm-2 control-label">Site URL</label>
+		<div class="col-sm-10 col-md-10">
+			<p class="form-control-static"><!-- soy:out="site_url" -->/var/www<!-- /soy:out="site_url" --></p>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<label for="inputEmail3" class="col-sm-2 control-label">Site Directory</label>
+		<div class="col-sm-10 col-md-10">
+			<p class="form-control-static"><!-- soy:out="site_directory" -->http://AAAAAAAAAA/<!-- /soy:out="site_directory" --></p>
+		</div>
+	</div>
+
+	<div class="form-group">
+		<label for="inputEmail3" class="col-sm-2 control-label">Admin URL</label>
+		<div class="col-sm-10 col-md-10">
+			<div class="form-inline">
+				<!-- soy:out="site_url" -->http://AAAAAAAAAA/<!-- /soy:out="site_url" --> <input soy:id="input_admin_url" type="text" class="form-control" />
+				<button id="btn_gen_admin_url" type="button" class="btn btn-info">Generate</button>
+			</div>
+		</div>
+	</div>
+
+	<h4 style="margin-top: 64px;">About You</h4>
+
+	<div class="form-group has-feedback">
+		<label for="inputEmail3" class="col-sm-2 control-label">Your Name</label>
+		<div class="col-sm-10 col-md-10">
+			<input soy:id="input_admin_name" type="text" class="form-control" />
+			<span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
+		</div>
+	</div>
+	
+	<div class="form-group has-feedback">
+		<label for="inputEmail3" class="col-sm-2 control-label">User ID</label>
+		<div class="col-sm-10 col-md-10">
+			<input soy:id="input_admin_slug" type="text" class="form-control" />
+			<span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
+			<span class="help-block">alphabet, number, -(hyphon), _(underscore)</span>
+		</div>
+	</div>
+
+	<div class="form-group has-feedback">
+		<label for="inputEmail3" class="col-sm-2 control-label">Password</label>
+		<div class="col-sm-10 col-md-10">
+			<input soy:id="input_admin_password" type="password" class="form-control" />
+			<span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
+		</div>
+	</div>
+
+	
+
+	<div class="form-group" style="margin-top:64px;">
+		<div class="col-md-12">
+			<p class="text-center">
+				<button type="submit" class="btn btn-lg btn-primary"><i class="glyphicon glyphicon-flash"></i> Start!</button>
+			</p>
+		</div>
+	</div>
+
+</form>
+
+<script type="text/javascript">
+$(function(){
+	
+	$("#btn_gen_admin_url").on("click",function(){
+		var random_value = "";
+		var words = "abcdefghjiklmnopqrstuvwxyz0123456789";
+		for(var i=0;i<10;i++){
+			var val = Math.floor(Math.random() * words.length);
+			random_value += words[val];
+		}
+		$("input[name=Site\\[admin_url\\]]").val(random_value);
+	});
+	
+});
+</script>
+

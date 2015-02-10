@@ -1,0 +1,22 @@
+<?php
+use kalat\SiteConfig;
+?>
+
+<div class="pull-right">
+	<p soy:out="user_name">ユーザー名</p>
+	<a href="<?php echo ADMIN_PATH; ?>logout/" class="btn btn-default"><i class="glyphicon glyphicon-off"></i> Logout</a>
+</div>
+<h2><?php echo SiteConfig::get("site.name", "Kalat"); ?></h2>
+
+<hr />
+
+<ol class="breadcrumb">
+	<li><a href="<?php echo ADMIN_PATH; ?>">TOP</a></li>
+	<li class="active">Build Site</li>
+</ol>
+
+<p>Finished <!-- soy:out="build_time" /--> sec</p>
+
+	
+<a href="<?php echo ADMIN_PATH; ?>" class="btn btn-lg btn-default">Back</a>
+

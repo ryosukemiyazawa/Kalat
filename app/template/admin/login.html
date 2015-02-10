@@ -1,0 +1,37 @@
+<?php use kalat\SiteConfig; ?>
+<h2><?php echo SiteConfig::get("site.name", "Install Kalat"); ?></h2>
+
+<hr />
+
+<form class="form-horizontal" method="post">
+
+	<!-- soy:if="error" -->
+	<div class="alert alert-danger" role="alert">Failed!</div>
+	<!-- /soy:if="error" -->
+
+	<div class="form-group has-feedback">
+		<label for="inputEmail3" class="col-sm-2 control-label">Your Name</label>
+		<div class="col-sm-10 col-md-10">
+			<input soy:id="input_user_id" type="text" class="form-control" />
+			<span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
+		</div>
+	</div>
+
+	<div class="form-group has-feedback">
+		<label for="inputEmail3" class="col-sm-2 control-label">Password</label>
+		<div class="col-sm-10 col-md-10">
+			<input soy:id="input_user_password" type="password" class="form-control" />
+			<span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
+		</div>
+	</div>
+
+	<div class="form-group" style="margin-top:64px;">
+		<div class="col-md-12">
+			<p class="text-center">
+				<button type="submit" class="btn btn-lg btn-primary"><i class="glyphicon glyphicon-flash"></i> Login</button>
+			</p>
+		</div>
+	</div>
+
+</form>
+

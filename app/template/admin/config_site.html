@@ -1,0 +1,85 @@
+<?php
+use kalat\SiteConfig;
+?>
+
+<div class="pull-right">
+	<p soy:out="user_name">ユーザー名</p>
+	<a href="<?php echo ADMIN_PATH; ?>logout/" class="btn btn-default"><i class="glyphicon glyphicon-off"></i> Logout</a>
+</div>
+<h2><?php echo SiteConfig::get("site.name", "Kalat"); ?></h2>
+
+<hr />
+
+<ol class="breadcrumb">
+	<li><a href="<?php echo ADMIN_PATH; ?>">TOP</a></li>
+	<li class="active">Site Configure</li>
+</ol>
+
+<form class="form-horizontal" method="post">
+
+	<div class="form-group has-feedback">
+		<label for="input_site_name" class="col-sm-2 control-label">Name</label>
+		<div class="col-sm-10 col-md-10">
+			<input id="input_site_name" soy:id="input_site_name" type="text" class="form-control" />
+			<span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
+		</div>
+	</div>
+	
+	<div class="form-group has-feedback">
+		<label for="text_description" class="col-sm-2 control-label">Description</label>
+		<div class="col-sm-10 col-md-10">
+			<textarea id="text_description" soy:id="input_site_description" class="form-control" rows="4"></textarea>
+			<span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
+		</div>
+	</div>
+	
+	<div class="form-group has-feedback">
+		<label for="select_lang" class="col-sm-2 control-label">Language</label>
+		<div class="col-sm-10 col-md-10">
+			<input id="input_site_language" soy:id="input_site_language" type="hidden" class="form-control" />
+			<select id="select_lang" class="form-control">
+				<option value="en">English</option>
+				<option value="ja">Japanese</option>
+			</select>
+			<span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
+		</div>
+	</div>
+	
+	<div class="form-group has-feedback">
+		<label for="select_theme" class="col-sm-2 control-label">Theme</label>
+		<div class="col-sm-10 col-md-10">
+			<select id="select_theme" soy:id="select_theme" class="form-control"></select>
+			<span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>
+		</div>
+	</div>
+	
+	<div class="form-group" style="margin-top:64px;">
+		<div class="col-md-12">
+			<p class="text-center">
+				<button type="submit" class="btn btn-lg btn-info" style="margin-right:50px;"><i class="glyphicon glyphicon-flash"></i> Preview</button>
+				<button type="submit" class="btn btn-lg btn-primary"><i class="glyphicon glyphicon-flash"></i> Config</button>
+			</p>
+		</div>
+	</div>
+
+</form>
+
+
+
+<script type="text/javascript">
+$(function(){
+	var input_lang = $("#input_site_language");
+	var select_lang = $("#select_lang");
+	var lang_val = input_lang.val()
+	if(lang_val.length < 1){
+		lang_val = navigator.language;
+	}
+	select_lang.val(lang_val);
+	select_lang.on("change",function(){
+		input_lang.val($(this).val());
+	});
+	
+});
+</script>
+
+

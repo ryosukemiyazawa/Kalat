@@ -1,0 +1,55 @@
+<?php
+use kalat\SiteConfig;
+?>
+
+<div class="pull-right">
+	<p soy:out="user_name">ユーザー名</p>
+	<a href="<?php echo ADMIN_PATH; ?>logout/" class="btn btn-default"><i class="glyphicon glyphicon-off"></i> Logout</a>
+</div>
+<h2><?php echo SiteConfig::get("site.name", "Kalat"); ?></h2>
+
+<hr />
+
+<div class="well">
+	<a href="<?php echo ADMIN_PATH; ?>build/" class="btn btn-default">Build <small>Last Build: <!-- soy:out="last_building" /--></small></a>
+	<a href="<?php echo ADMIN_PATH; ?>clear_cache/" class="btn btn-default">Clear Cache</a>
+	
+	<div class="pull-right">
+		<a href="<?php echo ADMIN_PATH; ?>config_site/" class="btn btn-info">Site Configure</a>
+	</div>
+</div>
+
+<!-- soy:if="is_built" -->
+<!--
+<h4 class="page-header">Access</h4>
+
+<p>アクセス数情報</p>
+ -->
+
+<h4 class="page-header">Site</h4>
+
+<dl class="dl-horizontal">
+	<dt>Elapsed</dt>
+	<dd><!-- soy:out="build_elapsed" /--> sec</dd>
+	<dt>Page</dt>
+	<dd><!-- soy:out="page_count" /--></dd>
+	<dt>Entry</dt>
+	<dd><!-- soy:out="entry_count" /--></dd>
+</dl>
+
+<!-- /soy:if="is_built" -->
+
+<h4 class="page-header">PHP Client</h4>
+<p><a href="<?php echo ADMIN_PATH; ?>download_client/" class="btn btn-default">Download Client Script</a></p>
+
+<h4 class="page-header">User</h4>
+
+<p>
+	<a href="<?php echo ADMIN_PATH; ?>user" class="btn btn-default">User List</a>
+	<a href="<?php echo ADMIN_PATH; ?>user/create" class="btn btn-default">Create User</a>
+</p>
+
+<h4 class="page-header">Manual</h4>
+
+<p>マニュアルへのリンク（公式サイト）</p>
+
