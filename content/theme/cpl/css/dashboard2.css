@@ -1,0 +1,7 @@
+
+.form-group .form-control-feedback{
+	display: none;
+}
+.form-group.has-success .form-control-feedback{
+	display: inline;
+}
