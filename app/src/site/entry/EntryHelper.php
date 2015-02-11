@@ -67,8 +67,7 @@ class EntryHelper{
 			$where_query[] = "collection = :collection";
 			$binds[":collection"] = $entry->getCollection();
 		}
-		$where_query[] = "id ".$compare_type." :id";
-		$binds[":id"] = $entry->getId();
+		
 		
 		//現在のコレクションの設定を取得する
 		$collectionName = $entry->getCollection();
@@ -81,17 +80,22 @@ class EntryHelper{
 			$order_query[] = "create_date " . $order_query_sort;
 			$order_query[] = "id " . $order_query_sort;
 			$where_query[] = "create_date " . $compare_type_eq .":create_date";
+			$where_query[] = "id <> :id";
 			$binds[":create_date"] = $entry->getCreateDate();
+			$binds[":id"] = $entry->getId();
 			
 		}else if($orderby == "slug"){
 			
+			$where_query[] = "id ".$compare_type." :id";
 			$order_query[] = "id " . $order_query_sort;
 			$order_query[] = "create_date " . $order_query_sort;
+			$binds[":id"] = $entry->getId();
 			
 		}else{
 			
 			$order_query[] = "id " . $order_query_sort;
-			
+			$where_query[] = "id <> :id";
+			$binds[":id"] = $entry->getId();
 		}
 		
 		//SQLを構築

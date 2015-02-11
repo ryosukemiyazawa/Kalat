@@ -8,18 +8,13 @@ use kalat\site\entry\EntryHelper;
 
 SiteConfig::loadConfig("site");
 SiteConfig::loadConfig("collections");
+SiteConfig::loadConfig("theme");
 
 $starttime = microtime(true);
 
 $app->bind("display", function($app, $args) use($starttime){
 	$templatePath = $args["template"];
 	
-	//reuireだとセキュアじゃないから
-	$func = function($templatePath){
-		$page = SiteHelper::values();
-		include $templatePath;
-	};
-	$func($templatePath);
 	
 	//set user cookie
 	$cookieKey = "_kuser";
@@ -28,6 +23,13 @@ $app->bind("display", function($app, $args) use($starttime){
 		setcookie($cookieKey, $uid, time() + 365*24*3600);
 		$_COOKIE["_kuser"] = $uid;
 	}
+	
+	//reuireだとセキュアじゃないから
+	$func = function($templatePath){
+		$page = SiteHelper::values();
+		include $templatePath;
+	};
+	$func($templatePath);
 	
 	//write to access log
 	$access_log = _SYSTEM_DIR_ . "log/" . date("Ymd") . ".log";
@@ -132,6 +134,7 @@ $app->bind("get",function($app, $args) use ($starttime){ /* @var $app Applicatio
 	if(file_exists($templateDir . $templateName)){
 		$templatePath = $templateDir . $templateName;
 	}
+	
 	SiteHelper::put("current_directory", $pageConfig["directory"]);
 	SiteHelper::put("page_type", $type);
 	SiteHelper::put("current_label", $pageConfig["title"]);
@@ -147,20 +150,30 @@ $app->bind("get",function($app, $args) use ($starttime){ /* @var $app Applicatio
 
 $app->bind("show_entry",function($app, $args){ /* @var $app Application */
 	
-	/* @var $entry Kalat_Entry */
+	/* @var $entry KalatEntry */
 	$entry = $args[0];
 	
-	$content = file_get_contents($entry->getPath());
+	$content = $entry->loadContent();
+	
+	//load headers
+	
 	$type = "entry";
 	
 	//put values
 	SiteHelper::put("current_directory", $entry->getDirectory());
 	SiteHelper::put("current_label", $entry->getTitle());
 	SiteHelper::put("page_type", $type);
-	SiteHelper::put("title", $entry->getTitle());
-	SiteHelper::put("content", $content);
-	SiteHelper::put("author", $entry->getAuthor());
+	
 	SiteHelper::put("entry", $entry);
+	SiteHelper::put("entry.title", $entry->getTitle());
+	SiteHelper::put("entry.substitle", $entry->getAttribute("subtitle"));
+	SiteHelper::put("entry.content", $content);
+	SiteHelper::put("entry.author", $entry->getAuthor());
+	SiteHelper::put("entry.date", $entry->getCreateDate());
+	
+	foreach($entry->getHeaders() as $key => $value){
+		SiteHelper::put("entry." . $key, $value);
+	}
 	
 	$templateDir = SOY2HTMLConfig::TemplateDir();
 	$templatePath = $templateDir . $type . ".php";

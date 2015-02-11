@@ -9,7 +9,6 @@ use kalat\entity\KalatEntry;
 use kalat\entity\KalatPage;
 use kalat\SiteConfig;
 use kalat\entity\KalatContent;
-use kalat\builder\parser\MarkdownParser;
 use kalat\site\SiteHelper;
 
 /**
@@ -33,6 +32,8 @@ class SiteBuilder {
 	
 	// 作業用のパラメーター
 	private $currentPage = null; /* @var $currentPage KalatPage */
+	private $currentUrl = null;
+	private $attachments = array();
 	
 	public function __construct(SiteConfig $config){
 		$this->contentPath = $config->getConfigure("content_directory");
@@ -64,6 +65,13 @@ class SiteBuilder {
 		
 		$start = microtime(true);
 		
+		//themeファイルを読み込む
+		$themeId = SiteConfig::get("site.theme");
+		$path = THEMEDIR . $themeId . "/_functions.php";
+		if(file_exists($path)){
+			require_once $path;
+		}
+		
 		// 書き出し先
 		$tmpDirectory = $this->cachePath;
 		
@@ -83,6 +91,9 @@ class SiteBuilder {
 		// ページの構築を行う
 		$pageDir = $this->contentPath."_page/";
 		$files = $this->scanDirectory($pageDir);
+		
+		//set index page
+		$this->getPage("/")->setTitle("Home");
 		
 		foreach($files as $file){
 			$ext = $file["ext"];
@@ -129,12 +140,15 @@ class SiteBuilder {
 				return strcmp($a->getUrl(), $b->getUrl());
 			});
 			
+			$this->currentPage = $page;
 			foreach($entries as $entry){
+				$this->currentUrl = $entry->getUrl();
 				$this->publishEntry($tmpDirectory."_entry", $entry);
 				$entryCount++;
 			}
 			
 			$attachments = $page->getAttachments();
+			
 			if(count($attachments)>0){
 				$toPath = substr($page->getUrl(), 1);
 				$dirPath = $this->publicPath.$toPath;
@@ -281,7 +295,11 @@ class SiteBuilder {
 	function parseFile($parentUrl, $file){
 		$filename = $file["filename"];
 		$fullpath = $file["full"];
+		
 		$this->getDirectory($parentUrl)->addAttachment($filename, $fullpath);
+		
+		$url = $parentUrl . "/" . $filename;
+		$this->attachments[] = $url;
 	}
 	
 	/**
@@ -370,7 +388,7 @@ class SiteBuilder {
 		/* @var $content KalatContent */
 		$content = $page->getContent();
 		
-		$htmlCachePath = $content->getCachePath();
+		$htmlCachePath = $content->getCachePath("html");
 			
 		//変更がある場合は書き出しを行う
 		if($content->isChanged()){
@@ -409,7 +427,7 @@ class SiteBuilder {
 			
 			/* @var $content KalatContent */
 			$content = $entry->getContent();
-			$htmlCachePath = $content->getCachePath();
+			$htmlCachePath = $content->getCachePath("html");
 			$excerptCachePath = $content->getCachePath("excerpt.html");
 			
 			//変更がある場合は書き出しを行う
@@ -422,6 +440,9 @@ class SiteBuilder {
 				}
 				
 				//ヘッダーを書き出す
+				if($content->getAttribute("cover")){
+					$content->setAttribute("cover", $this->getImageUrl($content->getAttribute("cover")));
+				}
 				file_put_contents($headerCachePath, serialize($content->getAttributes()));
 				
 				//本文を書き出す
@@ -438,7 +459,7 @@ class SiteBuilder {
 			}
 			
 			
-			$entry->setPath($htmlCachePath);
+			$entry->setPath($content->getCachePath());
 			if($content->haveMore())$entry->setExcerptPath($excerptCachePath);
 			
 			//author情報が無い時はログインユーザーとする
@@ -595,25 +616,36 @@ class SiteBuilder {
 	public function getShortCodes(){
 		return $this->shortCodes;
 	}
-	public function doShortCodeImage($text, $args){
-		$url = $text;
+	public function getImageUrl($url){
 		
 		if(strlen($url)<1){
 			return "";
 		}
 		
 		if($url[0]=="/"){
-			return '<img src="'.$url.'" />';
+			return $url;
 		}
 		
 		if($this->currentPage && $this->currentPage->hasAttachment($url)){
 			$dirUrl = $this->currentPage->getUrl();
-			if($dirUrl=="/") $dirUrl = "";
-			$url = _SITE_PUBLIC_PATH_.$dirUrl.$url;
-			return '<img src="'.$url.'" />';
+			$url = _SITE_PUBLIC_PATH_.substr($dirUrl,1).$url;
+			return $url;
 		}
 		
-		return '<img src="'.$url.'" />';
+		if($this->currentPage){
+			$tmpUrl = $this->currentPage->getUrl() . $url;
+			
+			if(in_array($tmpUrl, $this->attachments)){
+				return _SITE_PUBLIC_PATH_ . substr($tmpUrl,1);
+			}
+			
+			$tmpUrl = $this->currentUrl . $url;
+			if(in_array($tmpUrl, $this->attachments)){
+				return _SITE_PUBLIC_PATH_ . substr($tmpUrl,1);
+			}
+		}
+		
+		return $url;
 	}
 	
 	public function joinURL(){

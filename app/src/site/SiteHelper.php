@@ -79,6 +79,7 @@ class SiteHelper{
 		if(!file_exists($path))return;
 		array_unshift($this->includeStack, [$module_name, $args]);
 		
+		$page = $this->values;
 		require $path;
 		array_pop($this->includeStack);
 	}

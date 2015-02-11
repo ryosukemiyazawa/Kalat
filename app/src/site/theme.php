@@ -2,7 +2,7 @@
 
 use kalat\builder\SiteBuilder;
 kalat_add_shortcode("image",function($text, $args = array()){
-	return SiteBuilder::getCurrentBuilder()->doShortCodeImage($text, $args);
+	return "<img src=\"" . SiteBuilder::getCurrentBuilder()->getImageUrl($text) . "\">";
 });
 
 kalat_add_shortcode("finish",function($text, $agrs = array()){

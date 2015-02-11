@@ -76,6 +76,7 @@ $(function(){
 	var lang_val = input_lang.val()
 	if(lang_val.length < 1){
 		lang_val = navigator.language;
+		input_lang.val(lang_val);
 	}
 	select_lang.val(lang_val);
 	select_lang.on("change",function(){

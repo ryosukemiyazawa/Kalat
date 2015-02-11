@@ -30,6 +30,28 @@ class KalatEntry{
 		return true;
 	}
 	
+	public function loadContent(){
+		$content_path = $this->path . ".html";
+		$header_path = $this->path . ".header";
+		
+		$headers = unserialize(file_get_contents($header_path));
+		$this->_headers = $headers;
+		
+		return file_get_contents($content_path);
+	}
+	
+	public function getContentPath(){
+		return $this->path . ".html";
+	}
+	
+	public function getHeaders(){
+		return $this->_headers;
+	}
+	
+	public function getAttribute($key,$defValue = null){
+		return (isset($this->_headers[$key])) ? $this->_headers[$key] : $defValue;
+	}
+	
 	private $id;
 	
 	private $title;
@@ -54,6 +76,9 @@ class KalatEntry{
 	private $updateDate;
 	
 	private $_content;
+	
+	private $_headers = array();
+	
 	
 	public function setContent($content){
 		$this->_content = $content;

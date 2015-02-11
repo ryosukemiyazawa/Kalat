@@ -19,7 +19,7 @@ class KalatContent{
 	public static function loadContent($path){
 		$obj = new KalatContent($path, null);
 
-		$cachePath = $obj->getCachePath();
+		$cachePath = $obj->getCachePath("html");
 		$obj->content = file_get_contents($cachePath);
 		
 		return $obj;
@@ -80,6 +80,10 @@ class KalatContent{
 			$this->changed = true;
 		}
 		
+		if(defined("_KALAT_FORCE_BUILD_") && _KALAT_FORCE_BUILD_){
+			$this->changed = true;
+		}
+		
 		//ヘッダーを読み込む
 		$this->loadHeader();
 	}
@@ -92,7 +96,7 @@ class KalatContent{
 		if($type){
 			return $this->cachePath . "." . $type;
 		}
-		return $this->cachePath . ".html";
+		return $this->cachePath;
 	}
 	
 	private function loadHeader(){

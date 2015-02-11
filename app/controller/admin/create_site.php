@@ -52,7 +52,7 @@ $app->bind("get",function($app){ /* @var $app Application */
 		"blog" => "Blog",
 		"personal" => "Personal",
 		"company" => "Company",
-		"Document" => "document",
+		"document" => "Document",
 	);
 	
 	$page = $app->page("Dashboard", "create_site", "_layout/default");

@@ -22,6 +22,18 @@ function kalat_site_name(){
 	return SiteConfig::get("site.name");
 }
 
+function kalat_site_lang(){
+	return SiteConfig::get("site.lang");
+}
+
+function kalat_get_config($key, $defValue = null){
+	return SiteConfig::get($key, $defValue);
+}
+function kalat_get_value($key, $defValue = null){
+	return SiteHelper::get($key, $defValue);
+}
+
+
 /* template include */
 
 function kalat_include(){
@@ -105,12 +117,13 @@ function kalat_find_entries($query = null, $limit = null, $offset = null){
 		if($obj->getExcerptPath()){
 			$content = file_get_contents($obj->getExcerptPath());
 		}else{
-			$content = file_get_contents($obj->getPath());
+			$content = $obj->loadContent();
 		}
 		
 		$result[] = array(
 			"id" => $obj->getId(),
 			"title" => $obj->getTitle(),
+			"description" => $obj->getAttribute("subtitle"),
 			"url" => _SITE_PUBLIC_PATH_ . substr($obj->getUrl(), 1),
 			"date" => $obj->getCreateDate(),
 			"content" => $content,
