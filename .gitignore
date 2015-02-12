@@ -9,7 +9,8 @@ content/_conf/*
 content/_page/*
 content/_post/*
 content/theme/*
-pubilc/*
+public/*
+.DS_Store
 
 # Commit your application's lock file http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file
 # You may choose to ignore a library lock file http://getcomposer.org/doc/02-libraries.md#lock-file

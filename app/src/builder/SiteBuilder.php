@@ -30,6 +30,8 @@ class SiteBuilder {
 	private $requireAutoFix = false;
 	private $author;	//default author
 	
+	private $forceBuild = false;
+	
 	// 作業用のパラメーター
 	private $currentPage = null; /* @var $currentPage KalatPage */
 	private $currentUrl = null;
@@ -153,7 +155,7 @@ class SiteBuilder {
 				$toPath = substr($page->getUrl(), 1);
 				$dirPath = $this->publicPath.$toPath;
 				if(!file_exists($dirPath)){
-					mkdir($toPath, 0700, true);
+					$this->mkdir($toPath);
 				}
 				
 				foreach($attachments as $file){
@@ -189,7 +191,7 @@ class SiteBuilder {
 			$toPath = $this->publicPath."theme/".$file["path"];
 			$dir = dirname($toPath);
 			if(!file_exists($dir)){
-				mkdir($dir, 0700, true);
+				$this->mkdir($dir);
 			}
 			copy($file["full"], $toPath);
 			
@@ -323,7 +325,7 @@ class SiteBuilder {
 		}
 		
 		//コンテンツを作成
-		$content = new KalatContent($fullpath, $cachePath);
+		$content = new KalatContent($fullpath, $cachePath, $this->forceBuild);
 		if($content->getAttribute("slug")){
 			$url = $this->createContentUrl($parentUrl, $content->getAttribute("slug"));
 		}
@@ -363,7 +365,7 @@ class SiteBuilder {
 			$cachePath .= "index";
 		}
 		
-		$content = new KalatContent($fullpath, $cachePath);
+		$content = new KalatContent($fullpath, $cachePath, $this->forceBuild);
 		
 		if($content->getAttribute("slug")){
 			$url = $this->createContentUrl($parentUrl, $content->getAttribute("slug"));
@@ -397,7 +399,7 @@ class SiteBuilder {
 			$excerptCachePath = $content->getCachePath("excerpt.html");
 		
 			if(!file_exists(dirname($htmlCachePath))){
-				mkdir(dirname($htmlCachePath), 0700, true);
+				$this->mkdir(dirname($htmlCachePath));
 			}
 		
 			//ヘッダーを書き出す
@@ -436,7 +438,7 @@ class SiteBuilder {
 				$headerCachePath = $content->getCachePath("header");
 				
 				if(!file_exists(dirname($htmlCachePath))){
-					mkdir(dirname($htmlCachePath), 0700, true);
+					$this->mkdir(dirname($htmlCachePath));
 				}
 				
 				//ヘッダーを書き出す
@@ -661,4 +663,14 @@ class SiteBuilder {
 		
 		return str_replace(array("///","//"), "/", implode("/", $res));
 	}
+	
+	private function mkdir($path){
+		$perm = (defined("_KALAT_DIRECTORY_PERMISSON_")) ? _KALAT_DIRECTORY_PERMISSON_ : 0700;
+		mkdir($path, $perm, true);
+	}
+	public function setForceBuild($forceBuild){
+		$this->forceBuild = $forceBuild;
+		return $this;
+	}
+	
 }

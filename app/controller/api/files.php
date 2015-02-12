@@ -43,8 +43,10 @@ $app->bind("get",function($app, $args){ /* @var $app Application */
 	
 	if($haveWriterPermission){
 		$targetDir[] = "_page";
-		foreach($collections as $collectionName){
-			$targetDir[] = "_" . $collectionName;
+		if(is_array($collections)){
+			foreach($collections as $collectionName){
+				$targetDir[] = "_" . $collectionName;
+			}
 		}
 	}
 	

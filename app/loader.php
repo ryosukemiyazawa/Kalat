@@ -12,10 +12,14 @@ if(!file_exists(KALAT_DIRECTORY . "conf/env.php")){
 	return;
 }
 
-
-
+/* 設定項目の読み込み */
 include KALAT_DIRECTORY . "conf/env.php";
 include KALAT_DIRECTORY . "conf/site.php";
+if(file_exists(KALAT_DIRECTORY . "conf/dev.php")){
+	include KALAT_DIRECTORY . "conf/dev.php";
+}else{
+	define("DEVELOPING_MODE", false);
+}
 
 $url = (isset($_GET["url"])) ? $_GET["url"] : "";
 

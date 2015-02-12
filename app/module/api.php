@@ -17,7 +17,7 @@ $module->set("error",function($message, $code = null) use ($module){
 	if(!$code){
 		$code = 1;	//default error
 	}
-	if(!isset($messsage)){ $messsage = "error"; }
+	if(!isset($message)){ $message = "error"; }
 	
 	$process_time = microtime(true) - $module->_time;
 	
@@ -30,7 +30,7 @@ $module->set("error",function($message, $code = null) use ($module){
 	
 	$result["error"] = array(
 		"code" => $code,
-		"message" => $messsage
+		"message" => $message
 	);
 	
 	echo json_encode($result, JSON_UNESCAPED_UNICODE);
@@ -54,6 +54,11 @@ $module->set("result",function($result) use ($module){
 
 $module->set("checkToken",function() use ($module){
 
+	if(!isset($_SERVER["HTTP_KALATTOKEN"])){
+		$module->error("invalid access token", 2);
+		return;
+	}
+	
 	$token = $_SERVER["HTTP_KALATTOKEN"];
 	$res = base64_decode($token);
 	$res = json_decode($res, true);

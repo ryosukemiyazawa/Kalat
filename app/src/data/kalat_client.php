@@ -29,14 +29,15 @@ class KalatClient{
 		"gen" => "build",
 		"build" => "build",
 		"cleanup" => "cleanup",
-		"hello" => "hello"
+		"hello" => "hello",
+		"versionup" => "versionUp"
 	);
 
 	function __construct(){
 		$this->contentDir = __DIR__ . "/content/";
 
 		if(!file_exists($this->contentDir)){
-			mkdir($this->contentDir);
+			$this->mkdir($this->contentDir);
 		}
 	}
 
@@ -123,7 +124,7 @@ class KalatClient{
 	
 					$dir = dirname($localpath);
 					if(!file_exists($dir)){
-						mkdir($dir, 0700, true);
+						$this->mkdir($dir);
 					}
 	
 					file_put_contents($localpath, $res);
@@ -199,6 +200,10 @@ class KalatClient{
 	 * 手元の編集をアップロードする
 	*/
 	function commit(){
+		
+		//force
+		$args = func_get_args();
+		$isForceCommit = (in_array("--force", $args));
 
 		//サーバーにリクエスト
 		$this->out("connect to server");
@@ -235,6 +240,24 @@ class KalatClient{
 				"content" => base64_encode(file_get_contents($localpath))
 			));
 		}
+		
+		if($isForceCommit){
+			foreach($status["notchange"] as $path){
+				$localpath = CONTENT_DIR . $path;
+			
+				if(filesize($localpath) < 1){
+					continue;
+				}
+			
+				$this->out("add " . $path . " (" . filesize($localpath) . " bytes)");
+				$res = $this->post("upload", array(
+					"path" => $path,
+					"time" => filemtime($localpath),
+					"content" => base64_encode(file_get_contents($localpath))
+				));
+			}
+		}
+		
 
 		if(count($status["missing"]) > 0){
 			$this->out("missing ");
@@ -246,12 +269,38 @@ class KalatClient{
 		$this->out("finish!");
 
 	}
+	
+	function versionUp($zipname){
+		
+		$args = array(
+			"update" => 1,
+		);
+		$files = array("package" => realpath($zipname));
+		$res = $this->upload("update", $args, $files);
+		$res = json_decode($res, true);
+		
+		if($res["success"]){
+			$this->out("success");
+			$this->out("result: ");
+			$this->out("  ". str_replace("\n","\n  ",$res["log"]));
+		}
+		
+	}
+	
 
 	function build(){
 
 		$this->out("start build");
+		
+		//force
+		$args = func_get_args();
+		$isForceCommit = (in_array("--force", $args));
 
-		$res = $this->call("build");
+		if($isForceCommit){
+			$res = $this->call("build",array("force" => true));
+		}else{
+			$res = $this->call("build");
+		}
 
 		if(!$res["success"]){
 			$this->out("error!");
@@ -267,6 +316,7 @@ class KalatClient{
 
 		$new_file_list = array();
 		$update_file_list = array();
+		$notchange_file_list = array();
 		$delete_file_list = array();
 		$missing_file_list = array();
 
@@ -285,6 +335,8 @@ class KalatClient{
 			if(file_exists($localpath) && filesize($localpath) > 0){
 				if(filemtime($localpath) > $array["utime"]){
 					$update_file_list[] = $path;
+				}else{
+					$notchange_file_list[] = $path;
 				}
 			}else{
 				$missing_file_list[] = $path;
@@ -303,6 +355,7 @@ class KalatClient{
 			"update" => $update_file_list,
 			"delete" => $delete_file_list,
 			"missing" => $missing_file_list,
+			"notchange" => $notchange_file_list
 		);
 
 	}
@@ -319,9 +372,10 @@ class KalatClient{
 		if(count($args) > 0){
 			$url .= "?" . http_build_query($args);
 		}
-
+		
 		$response = $this->request($url);
 		$res = json_decode($response, true);
+		
 		if(!$res){
 			$this->out("failed to decode request:");
 			$this->out($response);
@@ -337,7 +391,8 @@ class KalatClient{
 
 		$headers = array(
 			"Content-Type: application/x-www-form-urlencoded",
-			"Content-Length: ".strlen($data)
+			"Content-Length: ".strlen($data),
+			"KalatToken: " . $this->createToken()
 		);
 
 		$options = array(
@@ -355,6 +410,58 @@ class KalatClient{
 
 		return $res;
 
+	}
+	
+	function upload($api, $args, $files){
+		
+		$url = SERVER_URL . $api;
+		$headers = array(
+			"KalatToken: " . $this->createToken()
+		);
+		
+		$BOUNDARY = '--------------------------'.microtime(true);
+		$CRLF = "\r\n";
+		
+		$content = array();
+			
+		foreach($args as $key => $value){
+			$content[] = "--" . $BOUNDARY . $CRLF;
+			$content[] = "Content-Disposition: form-data; name=" . $key . $CRLF . $CRLF;
+			$content[] = $value . $CRLF;
+		}
+			
+		foreach($files as $key => $path){
+			$content[] = "--" . $BOUNDARY . $CRLF;
+			$content[] = sprintf('Content-Disposition: form-data; name="%s"; filename="%s"', $key, basename($path)) . $CRLF;
+			$content[] = 'Content-Type: application/octet-stream'. $CRLF . $CRLF;
+			
+			$content[] = file_get_contents($path) . $CRLF;
+		}
+		
+		$content[] = "--" . $BOUNDARY . "--" . $CRLF;
+		$content = implode("", $content);
+			
+		$headers = array_merge($headers,array(
+			"Content-Type: multipart/form-data; boundary=" . $BOUNDARY,
+			"Content-Length: ".strlen($content)
+		));
+		
+		$options = array(
+			'http'=>array(
+				'method'=>'POST',
+				'header'=> implode("\r\n", $headers),
+				"ignore_errors" => true,
+				"content" => $content
+			)
+		);
+		
+		$context = stream_context_create($options);
+	
+		$start = microtime(true);
+		$res = file_get_contents($url, false, $context);
+	
+		return $res;
+	
 	}
 
 	function request($url){
@@ -443,6 +550,11 @@ class KalatClient{
 			if($input == "n")return false;
 		}
 	}
+	
+	function mkdir($path){
+		$perm = (defined("_KALAT_DIRECTORY_PERMISSON_")) ? _KALAT_DIRECTORY_PERMISSON_ : 0700;
+		mkdir($path, $perm, true);
+	}
 
 }
 
@@ -478,6 +590,16 @@ class KalatClientInteractive extends KalatClient{
 
 	function execSync(){
 		$this->sync();
+		$this->waitCommand();
+	}
+	
+	function execCommit(){
+		$this->commit();
+		$this->waitCommand();
+	}
+	
+	function execBuild(){
+		$this->build();
 		$this->waitCommand();
 	}
 

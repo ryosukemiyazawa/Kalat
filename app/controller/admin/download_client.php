@@ -12,9 +12,9 @@ $app->bind("get",function($app){ /* @var $app Application */
 	
 	//header("Content-Type: text/html; ");
 	
-	$url = _SITE_PUBLIC_URL_ . ADMIN_API_URL;
+	$url = _SITE_PUBLIC_URL_ . ADMIN_API_URL . "/";
 	
-	$user = $app->session->getConfig("slug");
+	$user = $app->session->getConfig("user_id");
 	$password = $app->session->getConfig("password");
 	$key = md5(API_KEY . "|" . $password);
 	

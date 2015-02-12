@@ -15,7 +15,8 @@ $app->bind("post",function($app, $args){ /* @var $app Application */
 	
 	$path = $app->query("path");
 	$content = $app->query("content");
-	$time = $app->quety("time");
+	$time = $app->query("time");
+	
 	if($path[0] == "."){
 		die("invalid");
 	}
@@ -23,6 +24,11 @@ $app->bind("post",function($app, $args){ /* @var $app Application */
 	
 	$contentDirectory = SiteConfig::get("content_directory");
 	$path = $contentDirectory . $path;
+	
+	$dir = dirname($path);
+	if(!file_exists($dir)){
+		mkdir($dir, _KALAT_DIRECTORY_PERMISSON_, true);
+	}
 	
 	echo file_put_contents($path, base64_decode($content));
 	

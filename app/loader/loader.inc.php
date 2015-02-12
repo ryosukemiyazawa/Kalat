@@ -30,6 +30,8 @@ if(defined("DEVELOPING_MODE") && DEVELOPING_MODE){
 define("_CONTROLLER_DIR_", _SYSTEM_DIR_ . "controller/" . APP_MODE . "/");
 SOY2HTMLConfig::TemplateDir(_SYSTEM_DIR_ . "template/" . APP_MODE . "/");
 
+define("THEMEDIR", KALAT_DIRECTORY . "content/theme/");
+
 if(APP_MODE == "init"){
 	$cpl_theme_id = "cpl";
 	
@@ -40,7 +42,6 @@ if(APP_MODE == "init"){
 	$asset_url = $path . "assets/?path=";
 	
 	define("INIT_SITE_PATH", $path);
-	define("THEMEDIR", KALAT_DIRECTORY . "content/theme/");
 	define("THEMEPATH", $asset_url);
 	
 	SOY2HTMLConfig::LayoutDir(THEMEDIR . $cpl_theme_id . "/");
@@ -54,7 +55,6 @@ if(APP_MODE == "init"){
 	$asset_url = _SITE_PUBLIC_PATH_ . ADMIN_URL . "/assets/?path=";
 	
 	define("ADMIN_PATH", _SITE_PUBLIC_PATH_ . ADMIN_URL . "/");
-	define("THEMEDIR", KALAT_DIRECTORY . "content/theme/");
 	define("THEMEPATH", $asset_url);
 	
 	SOY2HTMLConfig::LayoutDir(THEMEDIR . $cpl_theme_id . "/");

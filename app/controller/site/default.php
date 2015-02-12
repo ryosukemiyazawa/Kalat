@@ -66,7 +66,6 @@ $app->bind("get",function($app, $args) use ($starttime){ /* @var $app Applicatio
 	$theme_id = SiteConfig::get("site.theme");
 	
 	define("THEMEPATH", _SITE_PUBLIC_PATH_ . "theme/");
-	define("THEMEDIR", _SITE_CONTENT_DIRECTORY_ . "theme/");
 	
 	SOY2HTMLConfig::TemplateDir(THEMEDIR . $theme_id . "/_template/");
 	SOY2HTMLConfig::LayoutDir(THEMEDIR . $theme_id . "/");

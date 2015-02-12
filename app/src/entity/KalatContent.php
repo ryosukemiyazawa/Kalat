@@ -48,7 +48,7 @@ class KalatContent{
 	private $content = "";
 	private $excerpt = null;
 	
-	function __construct($path, $cachePath = null){
+	function __construct($path, $cachePath = null, $forceBuild = false){
 		
 		$pathinfo = pathinfo($path);
 		
@@ -80,7 +80,7 @@ class KalatContent{
 			$this->changed = true;
 		}
 		
-		if(defined("_KALAT_FORCE_BUILD_") && _KALAT_FORCE_BUILD_){
+		if($forceBuild){
 			$this->changed = true;
 		}
 		

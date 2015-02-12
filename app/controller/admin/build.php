@@ -17,6 +17,7 @@ $app->bind("get",function($app){ /* @var $app Application */
 	
 	$builder = new SiteBuilder(SiteConfig::getInstance());
 	$builder->setAuthor($app->session->getSlug());
+	$builder->setForceBuild(true);
 	$builder->build(SiteHelper::instance());
 	
 	$end = microtime(true);

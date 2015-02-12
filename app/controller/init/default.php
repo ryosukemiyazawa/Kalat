@@ -105,6 +105,8 @@ $app->bind("doInit",function($app, $args){
 	$scripts[] = 'define("API_KEY", "'.$apiKey.'");';
 	$scripts[] = 'define("_SITE_CONTENT_DIRECTORY_", KALAT_DIRECTORY . "content/");';
 	$scripts[] = 'define("_SITE_PUBLIC_DIRECTORY_", KALAT_DIRECTORY . "public/");';
+	$directoryPermission = substr(sprintf('%o', fileperms(KALAT_DIRECTORY)),-4);
+	$scripts[] = 'define("_KALAT_DIRECTORY_PERMISSON_", '.$directoryPermission.');';
 	file_put_contents($envPath, implode("\n", $scripts));
 	
 	//サイトの情報を記述
@@ -120,7 +122,8 @@ $app->bind("doInit",function($app, $args){
 	$userPath = KALAT_DIRECTORY . "conf/user/".$slug.".php";
 	$scripts = array();
 	if(!file_exists(KALAT_DIRECTORY . "conf/user/")){
-		mkdir(KALAT_DIRECTORY . "conf/user/", 0700, true);
+		$perm = (defined("_KALAT_DIRECTORY_PERMISSON_")) ? _KALAT_DIRECTORY_PERMISSON_ : 0700;
+		mkdir(KALAT_DIRECTORY . "conf/user/", $perm, true);
 	}
 	
 	//default hash algo is sha256
